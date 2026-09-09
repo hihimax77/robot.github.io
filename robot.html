@@ -1,0 +1,1367 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b0d" />
+  <title>Nubo Desk Pal</title>
+  <style>
+
+:root {
+  --font-sans: "Outfit", ui-rounded, "Segoe UI", sans-serif;
+  --color-bg: #0b0b0d;
+  --color-surface: #141418;
+  --color-surface-2: #1c1c22;
+  --color-fg: #f2f0ec;
+  --color-muted: #9c9890;
+  --color-faint: #6e6b66;
+  --color-line: #2a2a32;
+  --color-accent: #7ee8ea;
+  --color-accent-fg: #081010;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+
+@layer base {
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    overflow: hidden;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+.nubo-app {
+  --pet-body: #2c2d36;
+  --pet-body-hi: #454654;
+  --pet-body-lo: #1b1c22;
+  --pet-accent: #5a5b68;
+  --pet-eye: #7ee8ea;
+  --scene-a: #0b0b0d;
+  --scene-b: #14141a;
+  --desk: #1a1b22;
+  --desk-edge: #0a0a0c;
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 18%, var(--scene-b), var(--scene-a) 62%);
+  color: var(--color-fg);
+  touch-action: none;
+  user-select: none;
+}
+
+.nubo-app[data-theme="pink"] {
+  --pet-body: #ffc0cb;
+  --pet-body-hi: #ffd6de;
+  --pet-body-lo: #e89aa8;
+  --pet-accent: #f08aa0;
+  --pet-eye: #ff8fab;
+  --scene-a: #160e11;
+  --scene-b: #24161b;
+  --desk: #2a1a1f;
+  --desk-edge: #12090c;
+}
+
+.nubo-app[data-theme="sunset"] {
+  --pet-body: #f1b04c;
+  --pet-body-hi: #f7c97a;
+  --pet-body-lo: #d4922e;
+  --pet-accent: #e09a38;
+  --pet-eye: #ffe0a3;
+  --scene-a: #140f09;
+  --scene-b: #231910;
+  --desk: #2a1f14;
+  --desk-edge: #120c07;
+}
+
+.nubo-app[data-theme="teal"] {
+  --pet-body: #40e0d0;
+  --pet-body-hi: #7aeee3;
+  --pet-body-lo: #2bb8ab;
+  --pet-accent: #2aa79c;
+  --pet-eye: #e8fffc;
+  --scene-a: #071211;
+  --scene-b: #0e1e1c;
+  --desk: #12302c;
+  --desk-edge: #06110f;
+}
+
+.nubo-app::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.9'/></svg>");
+  z-index: 6;
+}
+
+.nubo-scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-top: 48px;
+}
+
+.nubo-glow {
+  position: absolute;
+  width: min(70vw, 420px);
+  height: min(70vw, 420px);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--pet-eye) 28%, transparent),
+    transparent 68%
+  );
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.nubo-desk {
+  position: absolute;
+  left: 50%;
+  bottom: 11%;
+  width: min(88vw, 560px);
+  height: 18vh;
+  min-height: 88px;
+  transform: translateX(-50%);
+  background: radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, var(--desk) 80%, white 8%), var(--desk-edge));
+  border-radius: 50%;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 color-mix(in oklab, white 18%, transparent);
+  pointer-events: none;
+}
+
+.nubo-stage {
+  position: relative;
+  width: min(78vw, 340px);
+  height: min(92vw, 420px);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+
+@media (max-width: 430px) {
+  .nubo-stage {
+    width: 250px;
+    height: 310px;
+    zoom: 0.92;
+  }
+}
+
+.nubo-shadow {
+  position: absolute;
+  bottom: 18%;
+  width: 58%;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  filter: blur(6px);
+  transform-origin: center;
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 280ms ease;
+}
+
+.nubo-shadow[data-held="1"] {
+  opacity: 0.28;
+  transform: scale(0.72);
+}
+
+.nubo-shadow[data-mood="faint"] {
+  transform: translateX(36px) scale(0.9);
+}
+
+.nubo-robot {
+  position: relative;
+  width: 240px;
+  height: 280px;
+  transform-origin: 50% 88%;
+  animation: nubo-breathe 3.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.nubo-robot[data-held="1"] {
+  animation: none;
+  z-index: 4;
+}
+
+.nubo-head {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 168px;
+  height: 148px;
+  margin-left: -84px;
+  border-radius: 38px;
+  background:
+    linear-gradient(165deg, var(--pet-body-hi) 0%, var(--pet-body) 46%, var(--pet-body-lo) 100%);
+  box-shadow:
+    inset 0 2px 0 color-mix(in oklab, white 42%, transparent),
+    inset 0 -14px 22px color-mix(in oklab, black 22%, transparent),
+    0 0 0 1px color-mix(in oklab, white 18%, var(--pet-body)),
+    0 10px 24px rgba(0, 0, 0, 0.28);
+  z-index: 4;
+}
+
+.nubo-head::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 14%;
+  width: 38%;
+  height: 16%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nubo-cap {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 54px;
+  height: 18px;
+  margin-left: -27px;
+  border-radius: 999px;
+  background: var(--pet-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.nubo-oled {
+  position: absolute;
+  left: 50%;
+  top: 34px;
+  width: 128px;
+  height: 64px;
+  margin-left: -64px;
+  border-radius: 16px;
+  background: #07080a;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow:
+    inset 0 0 0 2px #111216,
+    0 0 22px color-mix(in oklab, var(--pet-eye) 34%, transparent);
+}
+
+.nubo-oled-canvas {
+  width: 128px;
+  height: 64px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.nubo-head-hit,
+.nubo-forehead,
+.nubo-mouth {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  z-index: 5;
+}
+
+.nubo-head-hit {
+  top: 0;
+  height: 32px;
+}
+
+.nubo-forehead {
+  top: 26px;
+  height: 44px;
+}
+
+.nubo-mouth {
+  bottom: 6px;
+  height: 44px;
+}
+
+.nubo-torso {
+  position: absolute;
+  left: 50%;
+  top: 126px;
+  width: 196px;
+  height: 128px;
+  margin-left: -98px;
+  border: 0;
+  padding: 0;
+  border-radius: 42px;
+  background:
+    linear-gradient(180deg, var(--pet-body-hi) 0%, var(--pet-body) 40%, var(--pet-body-lo) 100%);
+  box-shadow:
+    inset 0 2px 0 color-mix(in oklab, white 32%, transparent),
+    inset 0 -16px 24px color-mix(in oklab, black 20%, transparent),
+    0 0 0 1px color-mix(in oklab, white 16%, var(--pet-body)),
+    0 16px 28px rgba(0, 0, 0, 0.3);
+  z-index: 3;
+}
+
+.nubo-belly {
+  position: absolute;
+  left: 50%;
+  top: 34px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--pet-accent);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.nubo-plate {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  min-width: 72px;
+  max-width: 140px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in oklab, black 22%, var(--pet-body-lo));
+  color: color-mix(in oklab, white 80%, var(--pet-body-hi));
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.nubo-arm {
+  position: absolute;
+  top: 142px;
+  width: 34px;
+  height: 92px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, var(--pet-body-hi), var(--pet-accent) 40%, var(--pet-body-lo));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.28),
+    0 0 0 1px color-mix(in oklab, white 14%, var(--pet-body)),
+    0 8px 12px rgba(0, 0, 0, 0.2);
+  transform-origin: 50% 10%;
+  z-index: 2;
+  animation: nubo-arm-idle 3.2s ease-in-out infinite;
+}
+
+.nubo-arm[data-side="left"] {
+  left: 14px;
+  animation-delay: -0.6s;
+}
+
+.nubo-arm[data-side="right"] {
+  right: 14px;
+}
+
+.nubo-mood-label {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--scene-a) 55%, transparent);
+  color: var(--color-fg);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.nubo-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 8;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: calc(12px + env(safe-area-inset-top)) 16px 0;
+  pointer-events: none;
+}
+
+.nubo-top-actions,
+.nubo-brand {
+  pointer-events: auto;
+}
+
+.nubo-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nubo-brand-kicker {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.nubo-brand-name {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.nubo-top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.nubo-icon-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--color-fg) 12%, transparent);
+  background: color-mix(in oklab, var(--color-surface) 82%, transparent);
+  color: var(--color-fg);
+  border-radius: 14px;
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease;
+}
+
+.nubo-icon-btn:active {
+  transform: scale(0.96);
+}
+
+.nubo-icon-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.nubo-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 7;
+  margin: 0;
+  width: min(88vw, 420px);
+  padding: 0 12px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  pointer-events: none;
+  text-wrap: pretty;
+}
+
+.nubo-help {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: calc(68px + env(safe-area-inset-top));
+  z-index: 9;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px 16px 12px;
+  border-radius: 24px;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in oklab, var(--color-fg) 12%, transparent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.nubo-help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.nubo-help-head p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nubo-help ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.nubo-help li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--color-surface-2);
+}
+
+.nubo-help strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nubo-help span {
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+
+[hidden] {
+  display: none !important;
+}
+
+.nubo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.48);
+  z-index: 20;
+}
+
+.nubo-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(100vw, 380px);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  z-index: 21;
+  padding: calc(16px + env(safe-area-inset-top)) 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  border-left: 1px solid color-mix(in oklab, var(--color-fg) 10%, transparent);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.nubo-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nubo-sheet-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.nubo-field {
+  display: grid;
+  gap: 8px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.nubo-field-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.nubo-field-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-faint);
+  line-height: 1.5;
+}
+
+.nubo-input {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--color-fg) 14%, transparent);
+  background: var(--color-surface-2);
+  color: var(--color-fg);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 16px;
+}
+
+.nubo-input:focus {
+  outline: 2px solid color-mix(in oklab, var(--pet-eye) 70%, white);
+  outline-offset: 2px;
+}
+
+.nubo-btn {
+  height: 44px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 150ms ease-out;
+}
+
+.nubo-btn:active {
+  transform: scale(0.96);
+}
+
+.nubo-swatches {
+  display: grid;
+  gap: 8px;
+}
+
+.nubo-swatch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, var(--color-fg) 12%, transparent);
+  background: var(--color-surface-2);
+  color: var(--color-fg);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 150ms ease-out,
+    border-color 150ms ease;
+}
+
+.nubo-swatch:active {
+  transform: scale(0.96);
+}
+
+.nubo-swatch[data-selected="1"] {
+  border-color: color-mix(in oklab, var(--color-fg) 45%, transparent);
+}
+
+.nubo-swatch-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
+}
+
+.nubo-swatch[data-theme-id="black"] .nubo-swatch-dot {
+  background: #1a1b20;
+}
+.nubo-swatch[data-theme-id="pink"] .nubo-swatch-dot {
+  background: #ffc0cb;
+}
+.nubo-swatch[data-theme-id="sunset"] .nubo-swatch-dot {
+  background: #f1b04c;
+}
+.nubo-swatch[data-theme-id="teal"] .nubo-swatch-dot {
+  background: #40e0d0;
+}
+
+.nubo-swatch-name {
+  flex: 1;
+  text-align: left;
+}
+
+.nubo-swatch-spacer {
+  width: 16px;
+  height: 16px;
+}
+
+.nubo-food {
+  position: absolute;
+  right: -10px;
+  bottom: 6px;
+  width: 54px;
+  height: 64px;
+  z-index: 6;
+  pointer-events: none;
+  animation: nubo-food-in 2800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nubo-food-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+
+.nubo-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.nubo-part {
+  position: absolute;
+  display: grid;
+  place-items: center;
+}
+
+.nubo-part-heart {
+  color: #ff8fab;
+}
+
+.nubo-part-z {
+  color: var(--pet-eye);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.nubo-part-spark {
+  color: var(--pet-eye);
+  font-weight: 700;
+}
+
+.nubo-snore {
+  position: absolute;
+  left: 58%;
+  top: 22%;
+  color: var(--pet-eye);
+  font-size: 22px;
+  font-weight: 700;
+  animation: nubo-snore 2.4s ease-in-out infinite;
+}
+
+@keyframes nubo-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.012, 0.988);
+  }
+}
+
+@keyframes nubo-arm-idle {
+  0%,
+  100% {
+    transform: rotate(6deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+}
+
+.nubo-robot[data-mood="soothe"] {
+  animation: nubo-soothe 2.8s ease-in-out infinite;
+}
+
+.nubo-robot[data-mood="soothe"] .nubo-arm[data-side="left"] {
+  transform: rotate(18deg);
+  animation: none;
+}
+.nubo-robot[data-mood="soothe"] .nubo-arm[data-side="right"] {
+  transform: rotate(-18deg);
+  animation: none;
+}
+
+@keyframes nubo-soothe {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+.nubo-robot[data-mood="sleep"] {
+  animation: nubo-sleep 3.8s ease-in-out infinite;
+}
+
+.nubo-robot[data-mood="sleep"] .nubo-arm {
+  animation: none;
+  transform: rotate(22deg);
+}
+
+.nubo-robot[data-mood="sleep"] .nubo-arm[data-side="right"] {
+  transform: rotate(-22deg);
+}
+
+@keyframes nubo-sleep {
+  0%,
+  100% {
+    transform: translateY(8px) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(12px) rotate(-8deg);
+  }
+}
+
+.nubo-robot[data-mood="dizzy"] {
+  animation: nubo-dizzy 0.7s ease-in-out infinite;
+}
+
+.nubo-robot[data-mood="dizzy"] .nubo-arm {
+  animation: nubo-arm-flail 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes nubo-dizzy {
+  0%,
+  100% {
+    transform: rotate(-8deg) translateX(-6px);
+  }
+  50% {
+    transform: rotate(8deg) translateX(6px);
+  }
+}
+
+@keyframes nubo-arm-flail {
+  from {
+    transform: rotate(-28deg);
+  }
+  to {
+    transform: rotate(32deg);
+  }
+}
+
+.nubo-robot[data-mood="faint"] {
+  animation: nubo-faint 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nubo-robot[data-mood="faint"] .nubo-arm {
+  animation: none;
+  transform: rotate(70deg);
+}
+
+@keyframes nubo-faint {
+  to {
+    transform: translate(48px, 36px) rotate(78deg);
+  }
+}
+
+.nubo-robot[data-mood="cry"] {
+  animation: nubo-cry 0.45s ease-in-out infinite;
+}
+
+.nubo-robot[data-mood="cry"] .nubo-arm[data-side="left"] {
+  transform: rotate(-40deg) translate(10px, -18px);
+  animation: none;
+}
+.nubo-robot[data-mood="cry"] .nubo-arm[data-side="right"] {
+  transform: rotate(40deg) translate(-10px, -18px);
+  animation: none;
+}
+
+@keyframes nubo-cry {
+  0%,
+  100% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.nubo-robot[data-mood="eat"] {
+  animation: nubo-eat 0.28s ease-in-out infinite;
+}
+
+@keyframes nubo-eat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+.nubo-robot[data-mood="startle"] {
+  animation: nubo-startle 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nubo-robot[data-mood="startle"] .nubo-arm {
+  animation: none;
+  transform: rotate(-28deg);
+}
+
+.nubo-robot[data-mood="startle"] .nubo-arm[data-side="right"] {
+  transform: rotate(28deg);
+}
+
+@keyframes nubo-startle {
+  0% {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: translateY(-22px) scale(0.96, 1.06);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+.nubo-robot[data-mood="angry"] {
+  animation: nubo-angry 0.35s ease-in-out infinite;
+}
+
+.nubo-robot[data-mood="angry"] .nubo-arm {
+  animation: none;
+  transform: rotate(12deg);
+}
+
+@keyframes nubo-angry {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+.nubo-robot[data-mood="curious"] .nubo-head {
+  transform: rotate(-8deg);
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nubo-robot[data-mood="curious"] .nubo-arm[data-side="right"] {
+  transform: rotate(32deg);
+  animation: none;
+}
+
+.nubo-robot[data-mood="happy"] {
+  animation: nubo-happy 0.55s cubic-bezier(0.34, 1.36, 0.64, 1) infinite;
+}
+
+.nubo-robot[data-mood="happy"] .nubo-arm {
+  animation: none;
+  transform: rotate(-42deg);
+}
+
+.nubo-robot[data-mood="happy"] .nubo-arm[data-side="right"] {
+  transform: rotate(42deg);
+}
+
+@keyframes nubo-happy {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes nubo-food-in {
+  0% {
+    opacity: 0;
+    transform: translate(16px, 8px) scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-8px, 10px) scale(0.85);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-18px, 22px) scale(0.2);
+  }
+}
+
+@keyframes nubo-snore {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) scale(0.7);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(18px, -28px) scale(1.2);
+  }
+}
+
+.nubo-app[data-mood="sleep"] .nubo-glow {
+  opacity: 0.45;
+}
+
+.nubo-app[data-mood="angry"] .nubo-glow {
+  background: radial-gradient(circle, rgba(220, 80, 70, 0.28), transparent 68%);
+}
+
+@media (min-width: 720px) {
+  .nubo-robot {
+    transform: scale(1.12);
+    transform-origin: 50% 80%;
+  }
+  .nubo-brand-name {
+    font-size: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nubo-robot,
+  .nubo-arm,
+  .nubo-food,
+  .nubo-snore,
+  .nubo-glow {
+    animation: none !important;
+  }
+}
+
+</style>
+</head>
+<body>
+  <main id="app" class="nubo-app" data-theme="black" data-mood="boot">
+    <div id="scene" class="nubo-scene">
+      <div class="nubo-glow"></div>
+      <div class="nubo-desk"></div>
+      <div id="fx" class="nubo-fx" aria-hidden="true"></div>
+
+      <div class="nubo-stage">
+        <div id="shadow" class="nubo-shadow" data-held="0" data-mood="boot"></div>
+        <div id="robot" class="nubo-robot" data-mood="boot" data-held="0">
+          <span class="nubo-arm" data-side="left" data-mood="boot" aria-hidden="true"></span>
+          <span class="nubo-arm" data-side="right" data-mood="boot" aria-hidden="true"></span>
+
+          <button type="button" class="nubo-torso" data-zone="body" aria-label="點身體">
+            <span class="nubo-belly"></span>
+            <span id="plateName" class="nubo-plate">robot</span>
+          </button>
+
+          <div class="nubo-head">
+            <span class="nubo-cap" aria-hidden="true"></span>
+            <button type="button" class="nubo-head-hit" data-zone="head" aria-label="摸頭"></button>
+            <button type="button" class="nubo-forehead" data-zone="forehead" aria-label="連點額頭"></button>
+            <div class="nubo-oled">
+              <canvas id="face" width="128" height="64" class="nubo-oled-canvas" aria-hidden="true"></canvas>
+            </div>
+            <button type="button" class="nubo-mouth" data-zone="mouth" aria-label="點嘴巴"></button>
+            <div id="food"></div>
+          </div>
+        </div>
+        <p id="moodLabel" class="nubo-mood-label">開機中</p>
+      </div>
+    </div>
+
+    <header class="nubo-top">
+      <div class="nubo-brand">
+        <span class="nubo-brand-kicker">Desk pal</span>
+        <span id="brandName" class="nubo-brand-name">robot</span>
+      </div>
+      <div class="nubo-top-actions">
+        <button id="helpBtn" type="button" class="nubo-icon-btn" aria-label="玩法" title="玩法">?</button>
+        <button id="settingsBtn" type="button" class="nubo-icon-btn" aria-label="開啟設定" title="設定">☰</button>
+      </div>
+    </header>
+
+    <aside id="helpPanel" class="nubo-help" aria-label="玩法" hidden>
+      <div class="nubo-help-head">
+        <p>怎麼跟他玩</p>
+        <button id="helpClose" type="button" class="nubo-icon-btn nubo-icon-btn-ghost" aria-label="關閉玩法">×</button>
+      </div>
+      <ul>
+        <li><strong>摸頭</strong><span>療癒表情，30 秒後會睡著</span></li>
+        <li><strong>抓起 / 搖晃</strong><span>暈眩、昏倒、哭哭，隨機一種</span></li>
+        <li><strong>點嘴巴</strong><span>吃棒棒糖、漢堡或壽司</span></li>
+        <li><strong>點身體</strong><span>驚嚇，點滿十次會生氣氣</span></li>
+        <li><strong>點畫面</strong><span>好奇地看向你點的地方</span></li>
+        <li><strong>連點額頭兩下</strong><span>驚喜、開心</span></li>
+      </ul>
+    </aside>
+
+    <p id="hint" class="nubo-hint">摸頭 · 點嘴巴 · 點身體 · 點畫面 · 搖一搖</p>
+
+    <div id="settingsOverlay" class="nubo-overlay" hidden></div>
+    <section id="settingsSheet" class="nubo-sheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <div class="nubo-sheet-head">
+        <h2 id="settingsTitle" class="nubo-sheet-title">設定</h2>
+        <button id="settingsClose" type="button" class="nubo-icon-btn nubo-icon-btn-ghost" aria-label="關閉設定">×</button>
+      </div>
+
+      <label class="nubo-field">
+        <span class="nubo-field-label">姓名</span>
+        <input id="nameInput" class="nubo-input" maxlength="16" placeholder="robot" />
+        <span class="nubo-field-hint">沒填的話會叫 robot</span>
+      </label>
+
+      <fieldset class="nubo-field">
+        <legend class="nubo-field-label">色系</legend>
+        <div class="nubo-swatches">
+          <button type="button" class="nubo-swatch" data-theme-id="black"><span class="nubo-swatch-dot"></span><span class="nubo-swatch-name">黑</span><span class="theme-check"></span></button>
+          <button type="button" class="nubo-swatch" data-theme-id="pink"><span class="nubo-swatch-dot"></span><span class="nubo-swatch-name">粉紅</span><span class="theme-check"></span></button>
+          <button type="button" class="nubo-swatch" data-theme-id="sunset"><span class="nubo-swatch-dot"></span><span class="nubo-swatch-name">夕陽橙</span><span class="theme-check"></span></button>
+          <button type="button" class="nubo-swatch" data-theme-id="teal"><span class="nubo-swatch-dot"></span><span class="nubo-swatch-name">土耳其藍</span><span class="theme-check"></span></button>
+        </div>
+      </fieldset>
+
+      <div class="nubo-field">
+        <span class="nubo-field-label">搖晃感應</span>
+        <p id="motionHint" class="nubo-field-hint" hidden>已開啟。搖晃手機會讓他暈眩、昏倒或哭哭。</p>
+        <button id="motionBtn" type="button" class="nubo-btn">允許搖晃感應</button>
+      </div>
+    </section>
+  </main>
+  <script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'nubo-settings-v1';
+  const SLEEP_AFTER_MS = 30000;
+  const SOOTHE_HOLD_MS = 5000;
+  const SHAKE_COOLDOWN = 1600;
+  const FOODS = ['lollipop', 'burger', 'sushi'];
+  const SHAKE_MOODS = ['dizzy', 'faint', 'cry'];
+  const MOOD_LABEL = {
+    boot:'開機中', idle:'放空', soothe:'療癒中', sleep:'睡著了', dizzy:'暈乎乎', faint:'昏倒了',
+    cry:'嗚嗚', eat:'好好吃', startle:'嚇到了', angry:'生氣氣', curious:'那是什麼', happy:'驚喜'
+  };
+  const EYE_COLOR = { black:'#7ee8ea', pink:'#ff8fab', sunset:'#ffe0a3', teal:'#e8fffc' };
+
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const app = $('#app'), scene = $('#scene'), robot = $('#robot'), shadow = $('#shadow');
+  const face = $('#face'), ctx2d = face.getContext('2d');
+  const moodLabel = $('#moodLabel'), plateName = $('#plateName'), brandName = $('#brandName');
+  const foodHost = $('#food'), fx = $('#fx');
+  const settingsSheet = $('#settingsSheet'), settingsOverlay = $('#settingsOverlay'), hint = $('#hint');
+  const nameInput = $('#nameInput'), motionBtn = $('#motionBtn'), motionHint = $('#motionHint');
+
+  const saved = (() => {
+    try {
+      const p = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      return {
+        name: typeof p.name === 'string' && p.name.trim() ? p.name.trim().slice(0,16) : 'robot',
+        theme: ['black','pink','sunset','teal'].includes(p.theme) ? p.theme : 'black'
+      };
+    } catch { return {name:'robot', theme:'black'}; }
+  })();
+
+  const state = {
+    name:saved.name, theme:saved.theme, mood:'boot', food:null, pokeCount:0,
+    lookX:0, lookY:0, held:false, blinking:false, motionReady:false,
+    lookTarget:{x:0,y:0}, lookNow:{x:0,y:0}, particles:[], partId:1,
+    lastShake:0, lastForehead:0, accPrev:null, drag:null, hold:null,
+    timers:{mood:0,sleep:0,blink:0}
+  };
+
+  function saveSettings(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({name:state.name, theme:state.theme})); } catch {}
+  }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function buzz(pattern){ try { navigator.vibrate?.(pattern); } catch {} }
+
+  function renderState(){
+    app.dataset.theme = state.theme; app.dataset.mood = state.mood;
+    robot.dataset.mood = state.mood; robot.dataset.held = state.held ? '1':'0';
+    shadow.dataset.mood = state.mood; shadow.dataset.held = state.held ? '1':'0';
+    $$('.nubo-arm').forEach(a => a.dataset.mood = state.mood);
+    moodLabel.textContent = MOOD_LABEL[state.mood];
+    brandName.textContent = state.name; plateName.textContent = state.name;
+    $$('.nubo-swatch').forEach(btn => {
+      const on = btn.dataset.themeId === state.theme;
+      btn.dataset.selected = on ? '1':'0'; btn.setAttribute('aria-pressed', String(on));
+      $('.theme-check', btn).textContent = on ? '✓' : '';
+    });
+    if (state.hold) {
+      robot.style.transform = `translate(${state.hold.x}px, ${state.hold.y}px) rotate(${state.hold.rot}deg)`;
+      robot.style.transition = 'none';
+      shadow.style.transform = `translateX(${state.hold.x*.4}px) scale(${.72 + Math.min(.2, Math.abs(state.hold.y)/400)})`;
+    } else {
+      robot.style.transform = ''; robot.style.transition = ''; shadow.style.transform = '';
+    }
+  }
+
+  function setMood(m){ state.mood=m; renderState(); }
+  function setFood(kind){ state.food=kind; renderFood(); }
+  function renderFood(){
+    if (!state.food) { foodHost.innerHTML=''; return; }
+    const svg = state.food === 'lollipop' ? `<svg viewBox="0 0 64 96" class="nubo-food-svg"><rect x="30" y="40" width="5" height="48" rx="2" fill="#e8d5b0"/><circle cx="32" cy="28" r="22" fill="#ff6b8a"/><path d="M32 10c10 0 18 8 18 18 0 4-1 7-3 10" fill="none" stroke="#ffe3ea" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="20" r="5" fill="rgba(255,255,255,.45)"/></svg>`
+      : state.food === 'burger' ? `<svg viewBox="0 0 72 64" class="nubo-food-svg"><ellipse cx="36" cy="18" rx="28" ry="12" fill="#e2a054"/><rect x="8" y="18" width="56" height="8" fill="#e2a054"/><rect x="10" y="26" width="52" height="6" rx="2" fill="#6dbd5b"/><rect x="9" y="32" width="54" height="10" rx="3" fill="#7a3e24"/><rect x="11" y="42" width="50" height="6" rx="2" fill="#f1d36b"/><ellipse cx="36" cy="52" rx="28" ry="9" fill="#c9843a"/><circle cx="22" cy="16" r="2.2" fill="#f4f0e6"/><circle cx="40" cy="14" r="1.8" fill="#f4f0e6"/></svg>`
+      : `<svg viewBox="0 0 80 48" class="nubo-food-svg"><ellipse cx="40" cy="28" rx="32" ry="14" fill="#1c1c20"/><ellipse cx="40" cy="24" rx="28" ry="11" fill="#f4efe6"/><ellipse cx="40" cy="18" rx="26" ry="9" fill="#e07070"/><path d="M18 18c8 4 36 4 44 0" fill="none" stroke="#f4efe6" stroke-width="2"/><rect x="36" y="8" width="8" height="28" fill="#1c1c20"/></svg>`;
+    foodHost.innerHTML = `<div class="nubo-food" data-kind="${state.food}" aria-hidden="true">${svg}</div>`;
+  }
+
+  let audioCtx=null, audioUnlocked=false;
+  function unlockAudio(){
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    if(!audioCtx) audioCtx=new AC(); if(audioCtx.state==='suspended') audioCtx.resume(); audioUnlocked=true;
+  }
+  function play(notes){
+    if(!audioCtx||!audioUnlocked)return; const t0=audioCtx.currentTime;
+    notes.forEach(n=>{ const at=t0+(n.delay||0), o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=n.type||'sine'; o.frequency.setValueAtTime(n.freq,at);
+      if(n.slide) o.frequency.exponentialRampToValueAtTime(Math.max(40,n.freq*n.slide),at+n.dur);
+      const gain=n.gain??.07; g.gain.setValueAtTime(.0001,at); g.gain.exponentialRampToValueAtTime(gain,at+.018); g.gain.exponentialRampToValueAtTime(.0001,at+n.dur);
+      o.connect(g); g.connect(audioCtx.destination); o.start(at); o.stop(at+n.dur+.02);
+    });
+  }
+  const sounds={
+    boot:()=>play([{freq:440,dur:.09},{freq:660,dur:.12,delay:.1},{freq:880,dur:.16,delay:.22,slide:1.1}]),
+    soothe:()=>play([{freq:523,dur:.14,gain:.05},{freq:659,dur:.18,delay:.12,gain:.05},{freq:784,dur:.22,delay:.26,gain:.04}]),
+    startle:()=>play([{freq:980,dur:.08,type:'square',gain:.04,slide:1.4}]),
+    angry:()=>play([{freq:140,dur:.16,type:'sawtooth',gain:.04},{freq:110,dur:.2,type:'sawtooth',gain:.04,delay:.14}]),
+    eat:()=>play([{freq:180,dur:.07,type:'triangle',gain:.06},{freq:160,dur:.07,type:'triangle',gain:.05,delay:.12},{freq:200,dur:.08,type:'triangle',gain:.05,delay:.24}]),
+    happy:()=>play([{freq:523,dur:.1},{freq:659,dur:.1,delay:.1},{freq:784,dur:.12,delay:.2},{freq:1046,dur:.18,delay:.32,gain:.05}]),
+    cry:()=>play([{freq:420,dur:.22,slide:.7,gain:.05},{freq:360,dur:.28,slide:.65,gain:.04,delay:.24}]),
+    dizzy:()=>play([{freq:500,dur:.18,slide:.6,type:'triangle',gain:.05},{freq:700,dur:.18,slide:.55,type:'triangle',gain:.04,delay:.16}]),
+    faint:()=>play([{freq:240,dur:.4,slide:.4,gain:.05}]), curious:()=>play([{freq:480,dur:.16,slide:1.6,gain:.045}]), sleep:()=>play([{freq:220,dur:.35,slide:.7,gain:.03}])
+  };
+
+  function spawn(kind,n){
+    const head=$('.nubo-head'), r=head.getBoundingClientRect(), s=scene.getBoundingClientRect();
+    for(let i=0;i<n;i++) state.particles.push({id:state.partId++,kind,x:r.left-s.left+r.width*.5+(Math.random()-.5)*40,y:r.top-s.top+r.height*.2+(Math.random()-.5)*16,vx:(Math.random()-.5)*40,vy:-30-Math.random()*50,life:.9+Math.random()*.5,max:1.2});
+    state.particles=state.particles.slice(-28);
+  }
+  function goMood(next,holdMs){
+    clearTimeout(state.timers.mood); setMood(next); sounds[next]?.();
+    if(next==='soothe')spawn('heart',5); if(next==='happy')spawn('spark',6); if(next==='sleep')spawn('zzz',3);
+    if(holdMs && !['sleep','angry'].includes(next)) state.timers.mood=setTimeout(()=>{setMood(state.pokeCount>=10?'angry':'idle');setFood(null);},holdMs);
+  }
+  function scheduleSleep(){ clearTimeout(state.timers.sleep); state.timers.sleep=setTimeout(()=>{goMood('sleep');buzz(12);},SLEEP_AFTER_MS); }
+  function interruptSleep(){ clearTimeout(state.timers.sleep); }
+
+  function petHead(){ interruptSleep(); state.pokeCount=0; setFood(null); goMood('soothe',SOOTHE_HOLD_MS); scheduleSleep(); buzz(12); }
+  function pokeBody(){ interruptSleep(); state.pokeCount++; setFood(null); if(state.pokeCount>=10){goMood('angry');buzz([30,40,40,40,50]);}else{goMood('startle',1100);buzz(24);} }
+  function eatMouth(){ interruptSleep(); setFood(pick(FOODS)); goMood('eat',2800); buzz(10); }
+  function happyForehead(){ interruptSleep(); setFood(null); goMood('happy',2600); buzz([10,20,10]); }
+  function curiousAt(x,y){ interruptSleep(); lookAtPoint(x,y); setFood(null); goMood('curious',1800); }
+  function handleTap(zone,x,y){
+    if(zone==='scene')return curiousAt(x,y); if(zone==='mouth')return eatMouth(); if(zone==='body')return pokeBody();
+    if(zone==='forehead'){const now=performance.now(); if(now-state.lastForehead<420){state.lastForehead=0;return happyForehead();}state.lastForehead=now;return petHead();} petHead();
+  }
+  function lookAtPoint(clientX,clientY){
+    const r=$('.nubo-oled').getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+    state.lookTarget.x=Math.max(-1,Math.min(1,(clientX-cx)/(innerWidth*.35))); state.lookTarget.y=Math.max(-1,Math.min(1,(clientY-cy)/(innerHeight*.35)));
+  }
+  function applyShake(){
+    const now=performance.now(); if(now-state.lastShake<SHAKE_COOLDOWN)return; state.lastShake=now; interruptSleep(); setFood(null); goMood(pick(SHAKE_MOODS),3200); buzz([18,40,30]); state.held=false;state.hold=null;renderState();
+  }
+
+  async function enableMotion(){
+    try {
+      const DM=window.DeviceMotionEvent; if(DM?.requestPermission){if(await DM.requestPermission()!=='granted')return;}
+      window.removeEventListener('devicemotion',onMotion); window.addEventListener('devicemotion',onMotion); state.motionReady=true;
+      motionBtn.hidden=true; motionHint.hidden=false;
+    } catch { window.addEventListener('devicemotion',onMotion); state.motionReady=true; motionBtn.hidden=true; motionHint.hidden=false; }
+  }
+  function onMotion(e){
+    const acc=e.accelerationIncludingGravity;if(!acc)return;const t=performance.now(),cur={x:acc.x||0,y:acc.y||0,z:acc.z||0,t},p=state.accPrev;state.accPrev=cur;
+    if(!p||t-p.t<50)return;const speed=Math.abs(cur.x-p.x)+Math.abs(cur.y-p.y)+Math.abs(cur.z-p.z);if(speed>22)applyShake();
+  }
+
+  function zonePointerDown(e){
+    e.stopPropagation();e.preventDefault();unlockAudio(); enableMotion(); const zone=e.currentTarget.dataset.zone; e.currentTarget.setPointerCapture?.(e.pointerId);
+    state.drag={pointerId:e.pointerId,zone,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,moved:false,samples:[{t:performance.now(),x:e.clientX,y:e.clientY}]};
+  }
+  $$('[data-zone]').forEach(el=>el.addEventListener('pointerdown',zonePointerDown));
+  scene.addEventListener('pointerdown',e=>{
+    if(e.target.closest('[data-zone],button,input,[role="dialog"]'))return; unlockAudio();enableMotion();state.drag={pointerId:e.pointerId,zone:'scene',sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,moved:false,samples:[]};
+  });
+  scene.addEventListener('pointermove',e=>{
+    const d=state.drag;if(!d||d.pointerId!==e.pointerId)return;d.x=e.clientX;d.y=e.clientY;const dist=Math.hypot(d.x-d.sx,d.y-d.sy),lift=d.sy-d.y;
+    if(d.zone!=='scene'&&(lift>42||dist>64)){
+      d.moved=true;state.held=true;const dx=d.x-d.sx,dy=d.y-d.sy;state.hold={x:dx,y:dy,rot:Math.max(-18,Math.min(18,dx*.08))};renderState();
+      const now=performance.now();d.samples.push({t:now,x:d.x,y:d.y});if(d.samples.length>12)d.samples.shift();const recent=d.samples.filter(s=>now-s.t<320);
+      if(recent.length>=6){let flips=0;for(let i=2;i<recent.length;i++){const a=recent[i],b=recent[i-1],c=recent[i-2],v1=b.x-c.x,v2=a.x-b.x;if(v1*v2<0&&Math.abs(v1)+Math.abs(v2)>18)flips++;}
+        let travel=0;for(let i=1;i<recent.length;i++)travel+=Math.hypot(recent[i].x-recent[i-1].x,recent[i].y-recent[i-1].y);if(flips>=3||travel>280){state.drag=null;applyShake();}}
+    }
+    if(d.zone==='scene')lookAtPoint(e.clientX,e.clientY);
+  });
+  scene.addEventListener('pointerup',e=>{
+    const d=state.drag;if(!d||d.pointerId!==e.pointerId)return;const moved=d.moved,zone=d.zone,x=e.clientX,y=e.clientY,lift=d.sy-d.y;state.drag=null;
+    if(state.held||moved){state.held=false;state.hold=null;renderState();if(lift>48||moved)applyShake();return;}handleTap(zone,x,y);
+  });
+  scene.addEventListener('pointercancel',()=>{state.drag=null;state.held=false;state.hold=null;renderState();});
+
+  $('#helpBtn').addEventListener('click',()=>{ $('#helpPanel').hidden=!$('#helpPanel').hidden; });
+  $('#helpClose').addEventListener('click',()=>{$('#helpPanel').hidden=true;});
+  function openSettings(){settingsOverlay.hidden=false;settingsSheet.hidden=false;hint.hidden=true;nameInput.value=state.name;nameInput.focus();}
+  function closeSettings(){settingsOverlay.hidden=true;settingsSheet.hidden=true;hint.hidden=false;commitName();}
+  $('#settingsBtn').addEventListener('click',openSettings); $('#settingsClose').addEventListener('click',closeSettings); settingsOverlay.addEventListener('click',closeSettings);
+  function commitName(){state.name=nameInput.value.trim().slice(0,16)||'robot';saveSettings();renderState();}
+  nameInput.addEventListener('blur',commitName); nameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){commitName();nameInput.blur();}if(e.key==='Escape')closeSettings();});
+  $$('.nubo-swatch').forEach(btn=>btn.addEventListener('click',()=>{state.theme=btn.dataset.themeId;saveSettings();renderState();}));
+  motionBtn.addEventListener('click',enableMotion);
+
+  function oval(ctx,cx,cy,rx,ry,color){rx=Math.max(1,Math.round(rx));ry=Math.max(1,Math.round(ry));ctx.fillStyle=color;for(let y=-ry;y<=ry;y++){const t=1-y*y/(ry*ry);if(t<0)continue;const xw=Math.round(Math.sqrt(t)*rx);ctx.fillRect(Math.round(cx)-xw,Math.round(cy)+y,xw*2+1,1);}}
+  function stamp(ctx,x0,y0,x1,y1,x2,y2,w,color){for(let i=0;i<=16;i++){const t=i/16,u=1-t;oval(ctx,u*u*x0+2*u*t*x1+t*t*x2,u*u*y0+2*u*t*y1+t*t*y2,w,w*.9,color);}}
+  function thickLine(ctx,x0,y0,x1,y1,r,color){const dx=x1-x0,dy=y1-y0,n=Math.max(8,Math.round(Math.hypot(dx,dy)));for(let i=0;i<=n;i++){const t=i/n;oval(ctx,x0+dx*t,y0+dy*t,r,r,color);}}
+  function spark(ctx,x,y,s,color){thickLine(ctx,x-s,y,x+s,y,1.2,color);thickLine(ctx,x,y-s,x,y+s,1.2,color);}
+  function parseHex(hex){const h=hex.replace('#','');return h.length===6?[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]:[126,232,234];}
+  function mix(a,b,t){a=parseHex(a);b=parseHex(b);const m=i=>Math.round(a[i]*(1-t)+b[i]*t);return `rgb(${m(0)} ${m(1)} ${m(2)})`;}
+  function drawFace(t){
+    const d={mood:state.mood,lookX:state.lookNow.x,lookY:state.lookNow.y,eyeColor:EYE_COLOR[state.theme],blinking:state.blinking,t};ctx2d.fillStyle='#07080a';ctx2d.fillRect(0,0,128,64);
+    const color=d.eyeColor,dim=mix(color,'#07080a',.38),lx=38+d.lookX*8,rx=90+d.lookX*8,ey=30+d.lookY*6;
+    if(d.mood==='boot'){const p=Math.min(1,d.t/.7);oval(ctx2d,64,32,22*p+8,2.2,color);if(p>.45){const open=(p-.45)/.55;oval(ctx2d,lx,ey,16,2+14*open,color);oval(ctx2d,rx,ey,16,2+14*open,color);}return;}
+    if(d.blinking&&['idle','curious'].includes(d.mood)){oval(ctx2d,lx,ey,16,2.2,color);oval(ctx2d,rx,ey,16,2.2,color);return;}
+    switch(d.mood){
+      case'idle':oval(ctx2d,lx,ey,16,15,color);oval(ctx2d,rx,ey,16,15,color);oval(ctx2d,lx-5,ey-5,4,3.5,mix(color,'#ffffff',.45));oval(ctx2d,rx-5,ey-5,4,3.5,mix(color,'#ffffff',.45));break;
+      case'soothe':stamp(ctx2d,lx-16,ey+6,lx,ey-11,lx+16,ey+6,2.6,color);stamp(ctx2d,rx-16,ey+6,rx,ey-11,rx+16,ey+6,2.6,color);oval(ctx2d,22,46,8,4,'#ff8fab');oval(ctx2d,106,46,8,4,'#ff8fab');break;
+      case'sleep':{const w=Math.sin(t*1.4)*.8;oval(ctx2d,lx,ey+3+w,17,2.2,color);oval(ctx2d,rx,ey+3-w,17,2.2,color);break;}
+      case'dizzy':{const a=t*6;oval(ctx2d,lx+Math.cos(a)*3,ey+Math.sin(a)*2,14,14,color);oval(ctx2d,lx+Math.cos(a+1.2)*5,ey+Math.sin(a+1.2)*4,5,5,dim);oval(ctx2d,rx+Math.cos(a+.7)*3,ey+Math.sin(a+.7)*2,14,14,color);oval(ctx2d,rx+Math.cos(a+2)*5,ey+Math.sin(a+2)*4,5,5,dim);spark(ctx2d,14,12,5+Math.sin(t*8),color);spark(ctx2d,114,16,4+Math.cos(t*7),color);break;}
+      case'faint':thickLine(ctx2d,lx-12,ey-11,lx+12,ey+11,2.6,color);thickLine(ctx2d,lx+12,ey-11,lx-12,ey+11,2.6,color);thickLine(ctx2d,rx-12,ey-11,rx+12,ey+11,2.6,color);thickLine(ctx2d,rx+12,ey-11,rx-12,ey+11,2.6,color);oval(ctx2d,64,52,8,3.5,color);break;
+      case'cry':oval(ctx2d,lx,ey,13,16,color);oval(ctx2d,rx,ey,13,16,color);oval(ctx2d,lx,ey-2,4,4,'#07080a');oval(ctx2d,rx,ey-2,4,4,'#07080a');stamp(ctx2d,50,48,64,56,78,48,1.8,color);{const drop=(t*28)%22+40;oval(ctx2d,lx,drop,2.6,4,color);oval(ctx2d,rx,drop+4,2.6,4,color);}break;
+      case'eat':stamp(ctx2d,lx-15,ey+4,lx,ey-10,lx+15,ey+4,2.5,color);stamp(ctx2d,rx-15,ey+4,rx,ey-10,rx+15,ey+4,2.5,color);{const chew=6+Math.abs(Math.sin(t*10))*6;oval(ctx2d,64,50,11,chew,color);oval(ctx2d,64,50,6,Math.max(1,chew-3),'#07080a');}break;
+      case'startle':oval(ctx2d,lx,ey,18,18,color);oval(ctx2d,rx,ey,18,18,color);oval(ctx2d,lx+d.lookX*4,ey+d.lookY*4,5,6,'#07080a');oval(ctx2d,rx+d.lookX*4,ey+d.lookY*4,5,6,'#07080a');break;
+      case'angry':thickLine(ctx2d,lx-16,ey-12,lx+14,ey-2,2.8,color);thickLine(ctx2d,rx+16,ey-12,rx-14,ey-2,2.8,color);oval(ctx2d,lx,ey+6,12,9,color);oval(ctx2d,rx,ey+6,12,9,color);oval(ctx2d,lx,ey+7,4,4,'#07080a');oval(ctx2d,rx,ey+7,4,4,'#07080a');thickLine(ctx2d,50,52,78,52,1.8,color);break;
+      case'curious':oval(ctx2d,lx,ey,12,17,color);oval(ctx2d,rx,ey,17,13,color);oval(ctx2d,lx+d.lookX*4,ey+d.lookY*5,4,5,'#07080a');oval(ctx2d,rx+d.lookX*5,ey+d.lookY*4,4.5,4.5,'#07080a');oval(ctx2d,lx-3,ey-5,3,2.5,mix(color,'#ffffff',.4));break;
+      case'happy':stamp(ctx2d,lx-17,ey+7,lx,ey-13,lx+17,ey+7,2.8,color);stamp(ctx2d,rx-17,ey+7,rx,ey-13,rx+17,ey+7,2.8,color);stamp(ctx2d,48,46,64,58,80,46,2,color);spark(ctx2d,12,12,6+Math.sin(t*8),color);spark(ctx2d,116,16,5+Math.cos(t*6),color);oval(ctx2d,20,46,8,4,'#ff8fab');oval(ctx2d,108,46,8,4,'#ff8fab');break;
+    }
+  }
+
+  function renderParticles(){
+    fx.innerHTML=state.particles.map(p=>{const opacity=Math.max(0,p.life/p.max),symbol=p.kind==='heart'?'♥':p.kind==='zzz'?'z':'+';return `<span class="nubo-part nubo-part-${p.kind==='heart'?'heart':p.kind==='zzz'?'z':'spark'}" style="left:${p.x}px;top:${p.y}px;opacity:${opacity};transform:translate(-50%,-50%) scale(${.7+opacity*.5})">${symbol}</span>`}).join('') + (state.mood==='sleep'?'<span class="nubo-snore">z</span>':'');
+  }
+
+  let last=performance.now(), faceStart=last;
+  function frame(now){
+    const dt=Math.min(.1,(now-last)/1000);last=now;state.lookNow.x+=(state.lookTarget.x-state.lookNow.x)*(1-Math.exp(-8*dt));state.lookNow.y+=(state.lookTarget.y-state.lookNow.y)*(1-Math.exp(-8*dt));
+    state.particles=state.particles.map(p=>({...p,x:p.x+p.vx*dt,y:p.y+p.vy*dt,vy:p.vy+40*dt,life:p.life-dt})).filter(p=>p.life>0);renderParticles();drawFace((now-faceStart)/1000);requestAnimationFrame(frame);
+  }
+  function blinkTick(){if(['idle','soothe','curious'].includes(state.mood)){state.blinking=true;setTimeout(()=>state.blinking=false,140);}state.timers.blink=setTimeout(blinkTick,2800+Math.random()*2600);}
+  setInterval(()=>{if(state.mood==='idle'&&!state.held){state.lookTarget.x=(Math.random()-.5)*1.2;state.lookTarget.y=(Math.random()-.5)*.8;}},3200);
+
+  renderState(); nameInput.value=state.name; requestAnimationFrame(frame); state.timers.blink=setTimeout(blinkTick,1800);
+  setTimeout(()=>{setMood('idle');},900);
+})();
+
+</script>
+</body>
+</html>
